@@ -480,5 +480,5 @@ bot.on("messageCreate", async (message) => {
   });
 
   // 最後回覆給用
-  await message.reply(finalResponse);
+  await message.reply(finalResponse.output_text);
 });

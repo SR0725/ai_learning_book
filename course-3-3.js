@@ -56,7 +56,7 @@ const tools = [
 ];
 
 // 使用一個簡單的 Array 來儲存筆記
-const notes = [];
+let notes = [];
 
 // 儲存筆記的函數
 function saveNote(title, content) {

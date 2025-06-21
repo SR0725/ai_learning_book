@@ -51,15 +51,16 @@ function smartTruncateMessages(messages, maxTokens = 900000) {
   
   // 如果 Token 數量超過限制，就開始「忘記」舊對話
   while (currentTokens > maxTokens && messages.length > 1) {
-    // 找出 system 訊息（AI 的角色設定）
-    const systemMessage = messages.find(m => m.role === 'system');
+    // 保留 system 訊息和最新的幾條對話
+    const systemMessages = messages.filter(m => m.role === 'system');
+    const nonSystemMessages = messages.filter(m => m.role !== 'system');
     
-    // 移除最舊的對話，但保留 system 訊息
-    messages = messages.filter((m, i) => !(i > 0 && m.role !== 'system'));
-    
-    // 確保 system 訊息永遠在最前面
-    if (systemMessage) {
-      messages = [systemMessage, ...messages.slice(1)];
+    // 移除最舊的非 system 訊息
+    if (nonSystemMessages.length > 0) {
+      nonSystemMessages.shift(); // 移除第一個（最舊的）
+      messages = [...systemMessages, ...nonSystemMessages];
+    } else {
+      break; // 只剩 system 訊息，無法再縮減
     }
     
     // 重新計算 Token 數量

@@ -1,0 +1,18 @@
+{
+  "name": "chapter-1",
+  "version": "1.0.0",
+  "description": "快速搭建出一個 Discord Bot 可以監聽訊息並給予回饋。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.19.3",
+    "dotenv": "^16.5.0",
+    "openai": "^5.0.2",
+    "tiktoken": "^1.0.21",
+    "zod": "^3.25.64"
+  }
+}

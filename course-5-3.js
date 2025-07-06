@@ -24,49 +24,45 @@ async function uploadFile(filePath) {
    return uploadedFile.id;
 }
 
-async function uploadMultipleFiles(filePaths, vectorStoreId) {
-  console.log(`📚 準備上傳 ${filePaths.length} 個檔案`);
+/**
+ * 建立向量資料庫，這樣我們便可以直接搜尋
+ */
+async function createVectorStore(name) {
+  console.log(`📚 建立向量資料庫：${name}`);
   
-  const fileIds = [];
-  
-  // 上傳所有檔案
-  for (const filePath of filePaths) {
-    const fileId = await uploadFile(filePath);
-    fileIds.push(fileId);
-  }
-  
-  // 批次加入向量資料庫
-  console.log(`📎 批次加入向量資料庫...`);
-  
-  const batch = await openai.vectorStores.fileBatches.createAndPoll(
-    vectorStoreId,
-    {
-      file_ids: fileIds,
-    }
-  );
-  
-  console.log(`✅ 批次處理完成！`);
-  console.log(`- 成功：${batch.file_counts.completed} 個檔案`);
-  console.log(`- 失敗：${batch.file_counts.failed} 個檔案`);
-  
-  return batch;
-}
-
-// 使用範例：建立一個包含多本書的知識庫
-const files = [
-  "./ray-cat-1.pdf", 
-  "./ray-cat-2.pdf",
-];
-
-const VECTOR_STORE_ID = "vs_6856b9d25edc8191b833e48cc3b6d885";
-async function setVectorStoreExpiration(vectorStoreId, days = 7) {
-  await openai.vectorStores.update(vectorStoreId, {
-    expires_after: {
-      anchor: "last_active_at",
-      days: days
-    }
+  const vectorStore = await openai.vectorStores.create({
+    name: name,
   });
-  
-  console.log(`⏰ 已設定向量資料庫 ${days} 天後自動過期`);
+
+  console.log(`✅ 向量資料庫建立成功！ID: ${vectorStore.id}`);
+  return vectorStore.id;
 }
-setVectorStoreExpiration(VECTOR_STORE_ID, 7);
+
+/**
+ * 將檔案加入向量資料庫
+ * 這個過程 OpenAI 會自動：
+ * 1. 解析 PDF 內容
+ * 2. 切分成適當大小的段落
+ * 3. 生成每個段落的向量
+ * 4. 建立搜尋索引
+ */
+async function addFileToVectorStore(vectorStoreId, fileId) {
+  console.log("將檔案加入向量資料庫");
+  await openai.vectorStores.files.create(vectorStoreId, {
+    file_id: fileId,
+  });
+  console.log("檔案加入向量資料庫成功！");
+}
+
+
+// 如果沒有建立過向量資料庫，可以先建立一個
+const VECTOR_STORE_ID = await createVectorStore("中二小說資料庫");
+
+// 如果已經建立過向量資料庫，可以先使用你建立好的 Vector Store ID
+// const VECTOR_STORE_ID = "vs_XXXXXXXXXXXXXXXXX";
+
+// 上傳檔案
+const fileId = await uploadFile("./ray-cat-story.pdf");
+
+// 將檔案加入向量資料庫
+await addFileToVectorStore(VECTOR_STORE_ID, fileId);

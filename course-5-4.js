@@ -19,7 +19,7 @@ bot.once("ready", () => {
 });
 
 // 這邊記得改成剛剛拿到的向量資料庫 id
-const VECTOR_STORE_ID = "vs_6856b9d25edc8191b833e48cc3b6d885";
+const VECTOR_STORE_ID = "vs_XXXXXXXXXXXXXXXXX";
 
 bot.on("messageCreate", async (message) => {
   if (message.author.bot) return;
